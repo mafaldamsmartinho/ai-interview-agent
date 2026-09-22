@@ -1,5 +1,6 @@
 langchain
 langchain-ollama
+langgraph
 pydantic
 pytest
 ruff
