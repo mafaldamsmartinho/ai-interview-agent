@@ -60,10 +60,7 @@ def evaluate_answer(state: InterviewState):
 def ask_to_continue(state: InterviewState):
     """Ask whether the user wants another question."""
 
-    command = input(
-        "\nPress Enter for the next question, "
-        "or type 'quit' to stop: "
-    )
+    command = input("\nPress Enter for the next question, or type 'quit' to stop: ")
 
     continue_interview = command.lower() not in {"quit", "exit"}
 
@@ -75,6 +72,7 @@ def ask_to_continue(state: InterviewState):
 # --------------------------------------------------
 # ROUTING
 # --------------------------------------------------
+
 
 def route_after_answer(state: InterviewState):
     """Stop immediately if the candidate typed quit."""
