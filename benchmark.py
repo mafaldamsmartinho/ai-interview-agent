@@ -1,8 +1,9 @@
 import time
 
+from langchain_core.exceptions import OutputParserException
+
 from models import ModelProvider, get_model
 from prompts.prompts import evaluation_prompt
-
 
 TEST_CASES = [
     {
@@ -39,7 +40,6 @@ def benchmark_model(provider: ModelProvider):
     print(f"\n--- {provider.value.upper()} ---")
 
     for i, case in enumerate(TEST_CASES, start=1):
-
         start = time.perf_counter()
 
         try:
@@ -57,7 +57,7 @@ def benchmark_model(provider: ModelProvider):
             print("Response:")
             print(response.content)
 
-        except Exception as error:
+        except OutputParserException as error:
             print(f"\nTest {i}")
             print(f"FAILED: {error}")
 
