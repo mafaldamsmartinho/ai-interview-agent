@@ -4,6 +4,8 @@ from langchain_core.exceptions import OutputParserException
 
 from models import ModelProvider, get_model
 from prompts.prompts import evaluation_prompt
+from router import route_model
+from schemas import Evaluation
 
 TEST_CASES = [
     {
@@ -29,13 +31,50 @@ TEST_CASES = [
             "important when processing another token."
         ),
     },
+    # Partially correct answer - swapped definitions
+    {
+        "question": "What is the difference between precision and recall?",
+        "answer": (
+            "Precision measures how many actual positives were found, "
+            "while recall measures how many predicted positives were correct."
+        ),
+    },
+    # Ambiguous question
+    {
+        "question": "Why might a model have high validation accuracy but still fail in production?",
+        "answer": (
+            "Maybe because the validation set was too easy, "
+            "or the real-world data changed. It could also be "
+            "overfitting, but I'm not sure."
+        ),
+    }
 ]
+
+
+def benchmark_router():
+    print("\n--- ROUTER ---")
+
+    for i, case in enumerate(TEST_CASES, start=1):
+        start = time.perf_counter()
+
+        decision = route_model(
+            question=case["question"],
+            answer=case["answer"],
+        )
+
+        latency = time.perf_counter() - start
+
+        print(f"\nTest {i}")
+        print(f"Selected model: {decision.model.value}")
+        print(f"Reason: {decision.reason}")
+        print(f"Routing latency: {latency:.2f}s")
 
 
 def benchmark_model(provider: ModelProvider):
     llm = get_model(provider)
 
-    evaluation_chain = evaluation_prompt | llm
+    structured_llm = llm.with_structured_output(Evaluation)
+    evaluation_chain = evaluation_prompt | structured_llm
 
     print(f"\n--- {provider.value.upper()} ---")
 
@@ -54,8 +93,9 @@ def benchmark_model(provider: ModelProvider):
 
             print(f"\nTest {i}")
             print(f"Latency: {latency:.2f}s")
-            print("Response:")
-            print(response.content)
+            print(f"Score: {response.score}/20")
+            print(f"Correctness: {response.correctness}")
+            print(f"Clarity: {response.clarity}")
 
         except OutputParserException as error:
             print(f"\nTest {i}")
@@ -63,8 +103,10 @@ def benchmark_model(provider: ModelProvider):
 
 
 def main():
-    benchmark_model(ModelProvider.QWEN)
-    benchmark_model(ModelProvider.LLAMA)
+    benchmark_router()
+
+    benchmark_model(ModelProvider.FAST)
+    benchmark_model(ModelProvider.STRONG)
 
 
 if __name__ == "__main__":
