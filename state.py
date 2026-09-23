@@ -1,14 +1,6 @@
 from typing import TypedDict
 
-from pydantic import BaseModel
-
-
-class Evaluation(BaseModel):
-    correctness: str
-    clarity: str
-    missing_concepts: str
-    improved_answer: str
-    score: int
+from schemas import Evaluation
 
 
 class InterviewState(TypedDict):
