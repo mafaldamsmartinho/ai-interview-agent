@@ -1,6 +1,8 @@
 from langchain_core.language_models.chat_models import BaseChatModel
 
+from models import get_model
 from prompts.prompts import evaluation_prompt, question_prompt
+from router import route_model
 from schemas import Evaluation
 from state import InterviewState
 
@@ -44,32 +46,35 @@ def collect_answer(state: InterviewState):
     }
 
 
-def evaluate_answer_node(llm: BaseChatModel):
+def evaluate_answer_node(state: InterviewState):
+    decision = route_model(
+        question=state["question"],
+        answer=state["answer"],
+    )
 
-    def evaluate_answer(state: InterviewState):
-        """Evaluate the candidate's answer."""
-        structured_llm = llm.with_structured_output(Evaluation)
-        evaluation_chain = evaluation_prompt | structured_llm
-        evaluation = evaluation_chain.invoke(
-            {
-                "question": state["question"],
-                "answer": state["answer"],
-            }
-        )
+    llm = get_model(decision.model)
 
-        print("\nFEEDBACK:")
-        print(f"Correctness: {evaluation.correctness}")
-        print(f"Clarity: {evaluation.clarity}")
-        print(f"Missing concepts: {evaluation.missing_concepts}")
-        print(f"Improved answer: {evaluation.improved_answer}")
-        print(f"Score: {evaluation.score}/20")
-
-        return {
-            "feedback": evaluation,
-            "previous_question": state["question"],
+    """Evaluate the candidate's answer."""
+    structured_llm = llm.with_structured_output(Evaluation)
+    evaluation_chain = evaluation_prompt | structured_llm
+    evaluation = evaluation_chain.invoke(
+        {
+            "question": state["question"],
+            "answer": state["answer"],
         }
+    )
 
-    return evaluate_answer
+    print("\nFEEDBACK:")
+    print(f"Correctness: {evaluation.correctness}")
+    print(f"Clarity: {evaluation.clarity}")
+    print(f"Missing concepts: {evaluation.missing_concepts}")
+    print(f"Improved answer: {evaluation.improved_answer}")
+    print(f"Score: {evaluation.score}/20")
+
+    return {
+        "feedback": evaluation,
+        "previous_question": state["question"],
+    }
 
 
 def ask_to_continue(state: InterviewState):

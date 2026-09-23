@@ -5,21 +5,28 @@ from langchain_ollama import ChatOllama
 
 
 class ModelProvider(str, Enum):
-    QWEN = "qwen"
-    LLAMA = "llama"
+    FAST = "fast"
+    STRONG = "strong"
 
 
 def get_model(provider: ModelProvider) -> BaseChatModel:
-    if provider == ModelProvider.QWEN:
+    if provider == ModelProvider.STRONG:
         return ChatOllama(
             model="qwen3:1.7b",
-            temperature=0.4,
+            temperature=0.0,
         )
 
-    if provider == ModelProvider.LLAMA:
+    if provider == ModelProvider.FAST:
         return ChatOllama(
-            model="llama3.2:1b",
-            temperature=0.4,
+            model="gemma3:1b",
+            temperature=0.0,
         )
 
     raise ValueError(f"Unsupported model provider: {provider}")
+
+
+def get_router_model() -> BaseChatModel:
+    return ChatOllama(
+        model="qwen2.5:1.5b",
+        temperature=0,
+    )
