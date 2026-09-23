@@ -1,6 +1,6 @@
-from langchain_core.language_models.chat_models import BaseChatModel
 from langgraph.graph import END, START, StateGraph
 
+from models import ModelProvider, get_model
 from nodes import (
     ask_to_continue,
     collect_answer,
@@ -12,12 +12,15 @@ from nodes import (
 from state import InterviewState
 
 
-def build_graph(llm: BaseChatModel):
+def build_graph():
     builder = StateGraph(InterviewState)
 
-    builder.add_node("generate_question", generate_question_node(llm))
+    # Fix the fast llm for the question
+    question_llm = get_model(ModelProvider.FAST)
+
+    builder.add_node("generate_question", generate_question_node(question_llm))
     builder.add_node("collect_answer", collect_answer)
-    builder.add_node("evaluate_answer", evaluate_answer_node(llm))
+    builder.add_node("evaluate_answer", evaluate_answer_node)
     builder.add_node("ask_to_continue", ask_to_continue)
 
     # Entry point
