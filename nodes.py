@@ -1,6 +1,7 @@
 from langchain_core.language_models.chat_models import BaseChatModel
 
 from prompts.prompts import evaluation_prompt, question_prompt
+from schemas import Evaluation
 from state import InterviewState
 
 # --------------------------------------------------
@@ -29,6 +30,7 @@ def generate_question_node(llm: BaseChatModel):
         return {
             "question": question,
         }
+
     return generate_question
 
 
@@ -46,24 +48,27 @@ def evaluate_answer_node(llm: BaseChatModel):
 
     def evaluate_answer(state: InterviewState):
         """Evaluate the candidate's answer."""
-        evaluation_chain = evaluation_prompt | llm
-
-        response = evaluation_chain.invoke(
+        structured_llm = llm.with_structured_output(Evaluation)
+        evaluation_chain = evaluation_prompt | structured_llm
+        evaluation = evaluation_chain.invoke(
             {
                 "question": state["question"],
                 "answer": state["answer"],
             }
         )
 
-        feedback = str(response.content)
-
         print("\nFEEDBACK:")
-        print(feedback)
+        print(f"Correctness: {evaluation.correctness}")
+        print(f"Clarity: {evaluation.clarity}")
+        print(f"Missing concepts: {evaluation.missing_concepts}")
+        print(f"Improved answer: {evaluation.improved_answer}")
+        print(f"Score: {evaluation.score}/20")
 
         return {
-            "feedback": feedback,
+            "feedback": evaluation,
             "previous_question": state["question"],
         }
+
     return evaluate_answer
 
 

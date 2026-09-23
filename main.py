@@ -7,9 +7,7 @@ def main():
     print("\nAI Interview Practice Agent")
     print("---------------------------")
 
-    model_choice = input(
-        "\nChoose model (qwen / llama): "
-    ).strip().lower()
+    model_choice = input("\nChoose model (qwen / llama): ").strip().lower()
 
     provider = ModelProvider(model_choice)
 

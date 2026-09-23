@@ -10,7 +10,7 @@ def load_prompt(filename: str) -> str:
 
 
 question_system_prompt = load_prompt("question_prompts/v1.0.0.txt")
-evaluation_system_prompt = load_prompt("evaluation_prompts/v1.0.0.txt")
+evaluation_system_prompt = load_prompt("evaluation_prompts/v1.1.0.txt")
 
 
 question_prompt = ChatPromptTemplate.from_messages(
