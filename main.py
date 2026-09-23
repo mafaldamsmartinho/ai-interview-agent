@@ -1,10 +1,21 @@
-from graph import graph
+from graph import build_graph
+from models import ModelProvider, get_model
 from state import InterviewState
 
 
 def main():
     print("\nAI Interview Practice Agent")
     print("---------------------------")
+
+    model_choice = input(
+        "\nChoose model (qwen / llama): "
+    ).strip().lower()
+
+    provider = ModelProvider(model_choice)
+
+    llm = get_model(provider)
+
+    graph = build_graph(llm)
 
     topic = input(
         "\nChoose a topic "

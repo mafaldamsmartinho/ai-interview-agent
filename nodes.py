@@ -1,4 +1,6 @@
-from prompts import evaluation_chain, question_chain
+from langchain_core.language_models.chat_models import BaseChatModel
+
+from prompts.prompts import evaluation_prompt, question_prompt
 from state import InterviewState
 
 # --------------------------------------------------
@@ -6,24 +8,28 @@ from state import InterviewState
 # --------------------------------------------------
 
 
-def generate_question(state: InterviewState):
-    """Generate the next interview question."""
+def generate_question_node(llm: BaseChatModel):
 
-    response = question_chain.invoke(
-        {
-            "topic": state["topic"],
-            "previous_question": state["previous_question"],
+    def generate_question(state: InterviewState):
+        """Generate the next interview question."""
+
+        question_chain = question_prompt | llm
+        response = question_chain.invoke(
+            {
+                "topic": state["topic"],
+                "previous_question": state["previous_question"],
+            }
+        )
+
+        question = str(response.content)
+
+        print("\nINTERVIEWER:")
+        print(question)
+
+        return {
+            "question": question,
         }
-    )
-
-    question = str(response.content)
-
-    print("\nINTERVIEWER:")
-    print(question)
-
-    return {
-        "question": question,
-    }
+    return generate_question
 
 
 def collect_answer(state: InterviewState):
@@ -36,31 +42,35 @@ def collect_answer(state: InterviewState):
     }
 
 
-def evaluate_answer(state: InterviewState):
-    """Evaluate the candidate's answer."""
+def evaluate_answer_node(llm: BaseChatModel):
 
-    response = evaluation_chain.invoke(
-        {
-            "question": state["question"],
-            "answer": state["answer"],
+    def evaluate_answer(state: InterviewState):
+        """Evaluate the candidate's answer."""
+        evaluation_chain = evaluation_prompt | llm
+
+        response = evaluation_chain.invoke(
+            {
+                "question": state["question"],
+                "answer": state["answer"],
+            }
+        )
+
+        feedback = str(response.content)
+
+        print("\nFEEDBACK:")
+        print(feedback)
+
+        return {
+            "feedback": feedback,
+            "previous_question": state["question"],
         }
-    )
-
-    feedback = str(response.content)
-
-    print("\nFEEDBACK:")
-    print(feedback)
-
-    return {
-        "feedback": feedback,
-        "previous_question": state["question"],
-    }
+    return evaluate_answer
 
 
 def ask_to_continue(state: InterviewState):
     """Ask whether the user wants another question."""
 
-    command = input("\nPress Enter for the next question, or type 'quit' to stop: ")
+    command = input("\nPress Enter for the next question, or type 'quit': ")
 
     continue_interview = command.lower() not in {"quit", "exit"}
 
