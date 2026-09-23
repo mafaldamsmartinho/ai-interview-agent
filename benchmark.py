@@ -41,13 +41,14 @@ TEST_CASES = [
     },
     # Ambiguous question
     {
-        "question": "Why might a model have high validation accuracy but still fail in production?",
+        "question": "Why might a model have high validation accuracy but still"
+        "fail in production?",
         "answer": (
             "Maybe because the validation set was too easy, "
             "or the real-world data changed. It could also be "
             "overfitting, but I'm not sure."
         ),
-    }
+    },
 ]
 
 
