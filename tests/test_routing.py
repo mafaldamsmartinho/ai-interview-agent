@@ -9,7 +9,7 @@ def test_high_score_routes_to_harder():
             clarity="Good",
             missing_concepts="None",
             improved_answer="",
-            score=18,
+            verdict="good",
         )
     }
 

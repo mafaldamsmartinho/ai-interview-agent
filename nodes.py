@@ -113,7 +113,7 @@ def route_after_continue(state: InterviewState):
 
 
 def route_by_score(state: InterviewState):
-    score = state["evaluation"].score
+    score = VERDICT_TO_SCORE[state["evaluation"].verdict]
 
     if score >= 16:
         return "harder"

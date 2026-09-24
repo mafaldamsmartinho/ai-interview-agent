@@ -7,7 +7,7 @@ def test_evaluation_schema():
         clarity="Clear",
         missing_concepts="None significant",
         improved_answer="Good answer",
-        score=17,
+        verdict="good",
     )
 
-    assert evaluation.score == 17
+    assert evaluation.verdict == "good"
