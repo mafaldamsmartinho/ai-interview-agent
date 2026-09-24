@@ -5,7 +5,7 @@ from langchain_core.exceptions import OutputParserException
 from models import ModelProvider, get_model
 from prompts.prompts import evaluation_prompt
 from router import route_model
-from schemas import Evaluation
+from schemas import VERDICT_TO_SCORE, Evaluation
 
 TEST_CASES = [
     {
@@ -94,7 +94,7 @@ def benchmark_model(provider: ModelProvider):
 
             print(f"\nTest {i}")
             print(f"Latency: {latency:.2f}s")
-            print(f"Score: {response.score}/20")
+            print(f"Score: {VERDICT_TO_SCORE[response.verdict]}/20")
             print(f"Correctness: {response.correctness}")
             print(f"Clarity: {response.clarity}")
 
