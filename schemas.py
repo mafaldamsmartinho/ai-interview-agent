@@ -1,6 +1,15 @@
-from pydantic import BaseModel, Field
+from typing import Literal
+
+from pydantic import BaseModel
 
 from models import ModelProvider
+
+VERDICT_TO_SCORE = {
+    "excellent": 20,
+    "good": 16,
+    "partial": 10,
+    "poor": 5,
+}
 
 
 class Evaluation(BaseModel):
@@ -8,7 +17,7 @@ class Evaluation(BaseModel):
     clarity: str
     missing_concepts: str
     improved_answer: str
-    score: int = Field(ge=0, le=20)
+    verdict: Literal["excellent", "good", "partial", "poor"]
 
 
 class RoutingDecision(BaseModel):

@@ -3,7 +3,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from models import get_model
 from prompts.prompts import evaluation_prompt, question_prompt
 from router import route_model
-from schemas import Evaluation
+from schemas import VERDICT_TO_SCORE, Evaluation
 from state import InterviewState
 
 # --------------------------------------------------
@@ -69,7 +69,7 @@ def evaluate_answer_node(state: InterviewState):
     print(f"Clarity: {evaluation.clarity}")
     print(f"Missing concepts: {evaluation.missing_concepts}")
     print(f"Improved answer: {evaluation.improved_answer}")
-    print(f"Score: {evaluation.score}/20")
+    print(f"Score: {VERDICT_TO_SCORE[evaluation.verdict]}/20")
 
     return {
         "feedback": evaluation,
@@ -113,7 +113,7 @@ def route_after_continue(state: InterviewState):
 
 
 def route_by_score(state: InterviewState):
-    score = state["evaluation"].score
+    score = VERDICT_TO_SCORE[state["evaluation"].verdict]
 
     if score >= 16:
         return "harder"
