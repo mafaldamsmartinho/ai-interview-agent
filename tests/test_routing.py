@@ -1,5 +1,5 @@
-from nodes import route_by_score
-from state import Evaluation
+from src.agent.nodes import route_by_score
+from src.agent.state import Evaluation
 
 
 def test_high_score_routes_to_harder():
