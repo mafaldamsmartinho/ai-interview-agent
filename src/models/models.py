@@ -30,3 +30,10 @@ def get_router_model() -> BaseChatModel:
         model="qwen2.5:1.5b",
         temperature=0,
     )
+
+
+def get_tool_guard_model():
+    return ChatOllama(
+        model="gemma3:1b",
+        temperature=0,
+    )

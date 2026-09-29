@@ -1,10 +1,11 @@
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from models import get_model
-from prompts.prompts import evaluation_prompt, question_prompt
-from router import route_model
-from schemas import VERDICT_TO_SCORE, Evaluation
-from state import InterviewState
+from schemas import VERDICT_TO_SCORE, Evaluation, ToolRequest
+from src.agent.state import InterviewState
+from src.models.models import get_model
+from src.models.router import route_model
+from src.prompts.prompts import evaluation_prompt, question_prompt
+from src.tools.tool_executor import execute_tool_request
 
 # --------------------------------------------------
 # NODES
@@ -16,11 +17,36 @@ def generate_question_node(llm: BaseChatModel):
     def generate_question(state: InterviewState):
         """Generate the next interview question."""
 
+        # Request question bank through the guarded tool executor
+        request = ToolRequest(
+            tool_name="get_question_bank",
+            arguments={
+                "topic": state["topic"],
+            },
+        )
+
+        tool_response = execute_tool_request(request)
+
+        # Extract MCP result
+        if tool_response["status"] == "executed":
+            mcp_result = tool_response["result"]
+
+            question_bank = (
+                mcp_result.structured_content.get("result", [])
+                if mcp_result.structured_content
+                else []
+            )
+        else:
+            question_bank = []
+
+        # Generate/adapt the interview question
         question_chain = question_prompt | llm
+
         response = question_chain.invoke(
             {
                 "topic": state["topic"],
                 "previous_question": state["previous_question"],
+                "question_bank": question_bank,
             }
         )
 
@@ -72,7 +98,7 @@ def evaluate_answer_node(state: InterviewState):
     print(f"Score: {VERDICT_TO_SCORE[evaluation.verdict]}/20")
 
     return {
-        "feedback": evaluation,
+        "evaluation": evaluation,
         "previous_question": state["question"],
     }
 
@@ -87,6 +113,23 @@ def ask_to_continue(state: InterviewState):
     return {
         "continue_interview": continue_interview,
     }
+
+
+def save_result_node(state: InterviewState):
+    evaluation = state["evaluation"]
+    request = ToolRequest(
+        tool_name="save_interview_result",
+        arguments={
+            "topic": state["topic"],
+            "question": state["question"],
+            "answer": state["answer"],
+            "score": VERDICT_TO_SCORE[evaluation.verdict],
+        },
+    )
+
+    result = execute_tool_request(request)
+
+    return {"tool_result": result}
 
 
 # --------------------------------------------------

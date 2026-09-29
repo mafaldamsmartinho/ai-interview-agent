@@ -1,0 +1,22 @@
+{
+  "Machine Learning": [
+    "What is the difference between precision and recall?",
+    "What is overfitting and how can it be reduced?",
+    "Why do we split data into training and test sets?"
+  ],
+  "LLMs": [
+    "What is the purpose of tokenization in a language model?",
+    "What is the difference between prompting and fine-tuning?",
+    "What is a context window?"
+  ],
+  "AI Agents": [
+    "What is the difference between a workflow and an agent?",
+    "What role does state play in an agentic system?",
+    "What is tool calling?"
+  ],
+  "Healthcare AI": [
+    "Why can false negatives be particularly important in medical classification?",
+    "What is dataset shift in a healthcare setting?",
+    "Why is external validation important for clinical machine learning models?"
+  ]
+}

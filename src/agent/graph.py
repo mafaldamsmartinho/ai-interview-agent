@@ -1,15 +1,16 @@
+from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 
-from models import ModelProvider, get_model
-from nodes import (
+from src.agent.nodes import (
     ask_to_continue,
     collect_answer,
     evaluate_answer_node,
     generate_question_node,
-    route_after_answer,
     route_after_continue,
+    save_result_node,
 )
-from state import InterviewState
+from src.agent.state import InterviewState
+from src.models.models import ModelProvider, get_model
 
 
 def build_graph():
@@ -21,6 +22,7 @@ def build_graph():
     builder.add_node("generate_question", generate_question_node(question_llm))
     builder.add_node("collect_answer", collect_answer)
     builder.add_node("evaluate_answer", evaluate_answer_node)
+    builder.add_node("save_result", save_result_node)
     builder.add_node("ask_to_continue", ask_to_continue)
 
     # Entry point
@@ -29,19 +31,14 @@ def build_graph():
     # Normal flow
     builder.add_edge("generate_question", "collect_answer")
 
-    # Conditional route:
-    # collect answer → evaluate OR finish
-    builder.add_conditional_edges(
-        "collect_answer",
-        route_after_answer,
-        {
-            "evaluate": "evaluate_answer",
-            "end": END,
-        },
-    )
+    # collect answer → evaluate
+    builder.add_edge("collect_answer", "evaluate_answer")
 
-    # Continue after evaluation
-    builder.add_edge("evaluate_answer", "ask_to_continue")
+    # Save after evaluation
+    builder.add_edge("evaluate_answer", "save_result")
+
+    # Continue after saving
+    builder.add_edge("save_result", "ask_to_continue")
 
     # Conditional route:
     # continue → another question
@@ -55,4 +52,6 @@ def build_graph():
         },
     )
 
-    return builder.compile()
+    checkpointer = InMemorySaver()
+
+    return builder.compile(checkpointer=checkpointer)

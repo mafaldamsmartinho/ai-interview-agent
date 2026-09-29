@@ -1,8 +1,8 @@
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from models import ModelProvider
+from src.models.models import ModelProvider
 
 VERDICT_TO_SCORE = {
     "excellent": 20,
@@ -22,4 +22,14 @@ class Evaluation(BaseModel):
 
 class RoutingDecision(BaseModel):
     model: ModelProvider
+    reason: str
+
+
+class ToolRequest(BaseModel):
+    tool_name: str
+    arguments: dict[str, Any] = Field(default_factory=dict)
+
+
+class ToolGuardDecision(BaseModel):
+    decision: Literal["allow", "confirm", "deny"]
     reason: str
