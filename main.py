@@ -1,5 +1,7 @@
-from graph import build_graph
-from state import InterviewState
+from langgraph.types import Command
+
+from src.agent.graph import build_graph
+from src.agent.state import InterviewState
 
 
 def main():
@@ -19,11 +21,36 @@ def main():
         "question": "",
         "previous_question": "None",
         "answer": "",
-        "feedback": "",
+        "evaluation": None,
         "continue_interview": True,
     }
 
-    graph.invoke(initial_state)
+    config = {
+        "configurable": {
+            "thread_id": "interview-1"
+        }
+    }
+
+    result = graph.invoke(
+        initial_state,
+        config=config,
+    )
+
+    print(result)
+
+    while "__interrupt__" in result:
+        confirmation = input(
+            "\nSave this interview result? (y/n): "
+        ).strip().lower()
+
+        approved = confirmation == "y"
+
+        result = graph.invoke(
+            Command(resume=approved),
+            config=config,
+        )
+
+        print(result)
 
 
 if __name__ == "__main__":
