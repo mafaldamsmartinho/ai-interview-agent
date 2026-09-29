@@ -3,9 +3,9 @@ from enum import Enum
 
 
 class AuthorizationTier(Enum):
-    AUTONOMOUS = 1   # execute automatically
-    NOTIFY = 2       # execute, then notify user
-    APPROVE = 3      # require human approval before execution
+    AUTONOMOUS = 1  # execute automatically
+    NOTIFY = 2  # execute, then notify user
+    APPROVE = 3  # require human approval before execution
 
 
 @dataclass
@@ -21,19 +21,16 @@ TOOL_TIERS = {
         tier=AuthorizationTier.AUTONOMOUS,
         reason="Read-only access to interview questions.",
     ),
-
     "get_topic_notes": ToolClassification(
         tool_name="get_topic_notes",
         tier=AuthorizationTier.AUTONOMOUS,
         reason="Read-only access to topic reference notes.",
     ),
-
     "get_candidate_history": ToolClassification(
         tool_name="get_candidate_history",
         tier=AuthorizationTier.AUTONOMOUS,
         reason="Read-only access to candidate interview history.",
     ),
-
     "save_interview_result": ToolClassification(
         tool_name="save_interview_result",
         tier=AuthorizationTier.APPROVE,

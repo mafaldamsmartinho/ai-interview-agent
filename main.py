@@ -25,11 +25,7 @@ def main():
         "continue_interview": True,
     }
 
-    config = {
-        "configurable": {
-            "thread_id": "interview-1"
-        }
-    }
+    config = {"configurable": {"thread_id": "interview-1"}}
 
     result = graph.invoke(
         initial_state,
@@ -39,9 +35,7 @@ def main():
     print(result)
 
     while "__interrupt__" in result:
-        confirmation = input(
-            "\nSave this interview result? (y/n): "
-        ).strip().lower()
+        confirmation = input("\nSave this interview result? (y/n): ").strip().lower()
 
         approved = confirmation == "y"
 

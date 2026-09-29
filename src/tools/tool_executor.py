@@ -39,9 +39,7 @@ def execute_tool_request(request: ToolRequest):
 
     # Local tool
     elif request.tool_name in TOOLS:
-        result = TOOLS[request.tool_name].invoke(
-            request.arguments
-        )
+        result = TOOLS[request.tool_name].invoke(request.arguments)
 
     else:
         return {

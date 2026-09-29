@@ -16,6 +16,4 @@ async def call_mcp_tool_async(tool_name: str, arguments: dict):
 
 def call_mcp_tool(tool_name: str, arguments: dict):
     """Synchronously call a tool exposed through MCP."""
-    return asyncio.run(
-        call_mcp_tool_async(tool_name, arguments)
-    )
+    return asyncio.run(call_mcp_tool_async(tool_name, arguments))

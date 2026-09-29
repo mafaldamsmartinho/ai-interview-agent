@@ -2,10 +2,10 @@ import time
 
 from langchain_core.exceptions import OutputParserException
 
-from src.models.models import ModelProvider, get_model
-from src.prompts.prompts import evaluation_prompt
-from src.models.router import route_model
 from schemas import VERDICT_TO_SCORE, Evaluation
+from src.models.models import ModelProvider, get_model
+from src.models.router import route_model
+from src.prompts.prompts import evaluation_prompt
 
 TEST_CASES = [
     {
