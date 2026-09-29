@@ -6,4 +6,4 @@ pytest
 ruff
 langchain-openai
 python-dotenv
-"mcp[cli]"
+mcp[cli]
