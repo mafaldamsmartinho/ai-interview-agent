@@ -2,3 +2,5 @@
 __pycache__/
 *.pyc
 check.ps1
+data/*.db
+data/interview_history.json
