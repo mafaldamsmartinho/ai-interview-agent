@@ -1,0 +1,15 @@
+{
+    "Machine Learning": [
+        "Overfitting occurs when a model learns the training data too closely and generalizes poorly.",
+        "Precision measures how many predicted positives are actually positive.",
+        "Recall measures how many actual positives are correctly identified."
+    ],
+    "LLMs": [
+        "Transformers use attention mechanisms to model relationships between tokens.",
+        "Fine-tuning adapts a pretrained model to a more specific task or domain."
+    ],
+    "AI Agents": [
+        "Agents combine model reasoning with state, tools and actions.",
+        "Tool calling allows an agent to interact with external systems."
+    ]
+}
