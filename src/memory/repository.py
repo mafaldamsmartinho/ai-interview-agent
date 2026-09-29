@@ -19,9 +19,7 @@ def get_skill_profiles(topic: str) -> list[SkillProfile]:
     """Return all persistent skill profiles for a topic."""
 
     with SessionLocal() as session:
-        statement = select(SkillProfile).where(
-            SkillProfile.topic == topic
-        )
+        statement = select(SkillProfile).where(SkillProfile.topic == topic)
 
         return list(session.scalars(statement).all())
 
@@ -50,9 +48,7 @@ def update_skill_profile(
                 skill=skill,
                 attempts=1,
                 average_score=score,
-                weaknesses=json.dumps(
-                    [weakness] if weakness else []
-                ),
+                weaknesses=json.dumps([weakness] if weakness else []),
             )
 
             session.add(profile)
@@ -61,13 +57,11 @@ def update_skill_profile(
             total_score = profile.average_score * profile.attempts
 
             profile.attempts += 1
-            profile.average_score = (
-                total_score + score
-            ) / profile.attempts
+            profile.average_score = (total_score + score) / profile.attempts
 
             weaknesses = json.loads(profile.weaknesses)
 
-            if weakness.strip().lower() not in no_weakness_values:
+            if weakness.strip().lower() not in no_weakness_values:  # noqa: SIM102
                 if weakness not in weaknesses:
                     weaknesses.append(weakness)
 

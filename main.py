@@ -41,9 +41,7 @@ def main():
     print(result)
 
     while "__interrupt__" in result:
-        confirmation = input(
-            "\nSave this interview result? (y/n): "
-        ).strip().lower()
+        confirmation = input("\nSave this interview result? (y/n): ").strip().lower()
 
         approved = confirmation == "y"
 

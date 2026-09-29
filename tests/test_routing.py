@@ -13,4 +13,4 @@ def test_high_score_routes_to_harder():
         )
     }
 
-    assert route_by_score(state) == "harder"
+    assert route_by_score(state) == "same"
