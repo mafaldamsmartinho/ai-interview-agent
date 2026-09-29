@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from state import Evaluation
+from src.agent.state import Evaluation
 
 
 def test_score_cannot_be_invalid():
