@@ -9,7 +9,7 @@ def load_prompt(filename: str) -> str:
     return (PROMPTS_DIR / filename).read_text(encoding="utf-8")
 
 
-question_system_prompt = load_prompt("question_prompts/v1.0.0.txt")
+question_system_prompt = load_prompt("question_prompts/v1.3.0.txt")
 evaluation_system_prompt = load_prompt("evaluation_prompts/v1.2.0.txt")
 
 

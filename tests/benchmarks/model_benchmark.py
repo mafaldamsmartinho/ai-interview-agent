@@ -94,7 +94,7 @@ def benchmark_model(provider: ModelProvider):
 
             print(f"\nTest {i}")
             print(f"Latency: {latency:.2f}s")
-            print(f"Score: {VERDICT_TO_SCORE[response.verdict]}/20")
+            print(f"Score: {VERDICT_TO_SCORE[response.verdict]}/10")
             print(f"Correctness: {response.correctness}")
             print(f"Clarity: {response.clarity}")
 

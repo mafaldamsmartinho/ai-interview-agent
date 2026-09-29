@@ -1,7 +1,13 @@
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from schemas import VERDICT_TO_SCORE, Evaluation, ToolRequest
+from schemas import (
+    VERDICT_TO_SCORE,
+    Evaluation,
+    InterviewQuestion,
+    ToolRequest,
+)
 from src.agent.state import InterviewState
+from src.memory.repository import get_skill_profiles, update_skill_profile
 from src.models.models import get_model
 from src.models.router import route_model
 from src.prompts.prompts import evaluation_prompt, question_prompt
@@ -15,9 +21,22 @@ from src.tools.tool_executor import execute_tool_request
 def generate_question_node(llm: BaseChatModel):
 
     def generate_question(state: InterviewState):
-        """Generate the next interview question."""
+        """Generate a question using the candidate's long-term memory."""
 
-        # Request question bank through the guarded tool executor
+        # Retrieve persistent skill memory
+        profiles = get_skill_profiles(state["topic"])
+
+        memory_context = [
+            {
+                "skill": profile.skill,
+                "attempts": profile.attempts,
+                "average_score": round(profile.average_score, 2),
+                "weaknesses": profile.weaknesses,
+            }
+            for profile in profiles
+        ]
+
+        # Request question bank
         request = ToolRequest(
             tool_name="get_question_bank",
             arguments={
@@ -27,7 +46,6 @@ def generate_question_node(llm: BaseChatModel):
 
         tool_response = execute_tool_request(request)
 
-        # Extract MCP result
         if tool_response["status"] == "executed":
             mcp_result = tool_response["result"]
 
@@ -39,24 +57,25 @@ def generate_question_node(llm: BaseChatModel):
         else:
             question_bank = []
 
-        # Generate/adapt the interview question
-        question_chain = question_prompt | llm
+        # Generate adaptive question
+        structured_llm = llm.with_structured_output(InterviewQuestion)
+        question_chain = question_prompt | structured_llm
 
         response = question_chain.invoke(
             {
                 "topic": state["topic"],
                 "previous_question": state["previous_question"],
                 "question_bank": question_bank,
+                "memory": memory_context,
             }
         )
 
-        question = str(response.content)
-
         print("\nINTERVIEWER:")
-        print(question)
+        print(response.question)
 
         return {
-            "question": question,
+            "question": response.question,
+            "skill": response.skill,
         }
 
     return generate_question
@@ -73,6 +92,8 @@ def collect_answer(state: InterviewState):
 
 
 def evaluate_answer_node(state: InterviewState):
+    """Evaluate the candidate's answer and update persistent memory."""
+
     decision = route_model(
         question=state["question"],
         answer=state["answer"],
@@ -80,9 +101,9 @@ def evaluate_answer_node(state: InterviewState):
 
     llm = get_model(decision.model)
 
-    """Evaluate the candidate's answer."""
     structured_llm = llm.with_structured_output(Evaluation)
     evaluation_chain = evaluation_prompt | structured_llm
+
     evaluation = evaluation_chain.invoke(
         {
             "question": state["question"],
@@ -95,7 +116,15 @@ def evaluate_answer_node(state: InterviewState):
     print(f"Clarity: {evaluation.clarity}")
     print(f"Missing concepts: {evaluation.missing_concepts}")
     print(f"Improved answer: {evaluation.improved_answer}")
-    print(f"Score: {VERDICT_TO_SCORE[evaluation.verdict]}/20")
+    print(f"Score: {VERDICT_TO_SCORE[evaluation.verdict]}/10")
+
+    # Update long-term skill memory
+    update_skill_profile(
+        topic=state["topic"],
+        skill=state["skill"],
+        verdict=evaluation.verdict,
+        weakness=evaluation.missing_concepts,
+    )
 
     return {
         "evaluation": evaluation,
@@ -137,15 +166,6 @@ def save_result_node(state: InterviewState):
 # --------------------------------------------------
 
 
-def route_after_answer(state: InterviewState):
-    """Stop immediately if the candidate typed quit."""
-
-    if state["answer"].lower() in {"quit", "exit"}:
-        return "end"
-
-    return "evaluate"
-
-
 def route_after_continue(state: InterviewState):
     """Either generate another question or finish."""
 
@@ -158,10 +178,10 @@ def route_after_continue(state: InterviewState):
 def route_by_score(state: InterviewState):
     score = VERDICT_TO_SCORE[state["evaluation"].verdict]
 
-    if score >= 16:
+    if score >= 8:
         return "harder"
 
-    if score >= 10:
+    if score >= 7:
         return "same"
 
     return "easier"

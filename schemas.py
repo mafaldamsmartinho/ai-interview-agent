@@ -5,10 +5,10 @@ from pydantic import BaseModel, Field
 from src.models.models import ModelProvider
 
 VERDICT_TO_SCORE = {
-    "excellent": 20,
-    "good": 16,
-    "partial": 10,
-    "poor": 5,
+    "excellent": 10,
+    "good": 7,
+    "partial": 4,
+    "poor": 2,
 }
 
 
@@ -33,3 +33,8 @@ class ToolRequest(BaseModel):
 class ToolGuardDecision(BaseModel):
     decision: Literal["allow", "confirm", "deny"]
     reason: str
+
+
+class InterviewQuestion(BaseModel):
+    question: str
+    skill: str
