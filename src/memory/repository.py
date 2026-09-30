@@ -30,41 +30,47 @@ def update_skill_profile(
     verdict: str,
     weakness: str,
 ) -> None:
-    """Create or update the candidate's persistent skill profile."""
-
     score = VERDICT_TO_SCORE[verdict] / 10
 
     with SessionLocal() as session:
-        statement = select(SkillProfile).where(
-            SkillProfile.topic == topic,
-            SkillProfile.skill == skill,
-        )
-
-        profile = session.scalar(statement)
-
-        if profile is None:
-            profile = SkillProfile(
-                topic=topic,
-                skill=skill,
-                attempts=1,
-                average_score=score,
-                weaknesses=json.dumps([weakness] if weakness else []),
+        try:
+            statement = select(SkillProfile).where(
+                SkillProfile.topic == topic,
+                SkillProfile.skill == skill,
             )
 
-            session.add(profile)
+            profile = session.scalar(statement)
 
-        else:
-            total_score = profile.average_score * profile.attempts
+            if profile is None:
+                profile = SkillProfile(
+                    topic=topic,
+                    skill=skill,
+                    attempts=1,
+                    average_score=score,
+                    weaknesses=json.dumps([weakness] if weakness else []),
+                )
 
-            profile.attempts += 1
-            profile.average_score = (total_score + score) / profile.attempts
+                session.add(profile)
 
-            weaknesses = json.loads(profile.weaknesses)
+            else:
+                total_score = profile.average_score * profile.attempts
 
-            if weakness.strip().lower() not in no_weakness_values:  # noqa: SIM102
-                if weakness not in weaknesses:
+                profile.attempts += 1
+                profile.average_score = (
+                    total_score + score) / profile.attempts
+
+                weaknesses = json.loads(profile.weaknesses)
+
+                if (
+                    weakness.strip().lower() not in no_weakness_values
+                    and weakness not in weaknesses
+                ):
                     weaknesses.append(weakness)
 
-            profile.weaknesses = json.dumps(weaknesses)
+                profile.weaknesses = json.dumps(weaknesses)
 
-        session.commit()
+            session.commit()
+
+        except Exception:
+            session.rollback()
+            raise
