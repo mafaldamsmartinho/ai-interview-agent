@@ -1,6 +1,6 @@
 from typing import NotRequired, TypedDict
 
-from schemas import Evaluation
+from schemas import Evaluation, InterviewPlan
 
 
 class InterviewState(TypedDict):
@@ -10,5 +10,7 @@ class InterviewState(TypedDict):
     previous_question: str
     answer: str
     evaluation: Evaluation | None
+    evaluation_reviewed: NotRequired[bool]
     tool_result: NotRequired[dict[str, str]]
     continue_interview: bool
+    interview_plan: NotRequired[InterviewPlan]
