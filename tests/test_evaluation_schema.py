@@ -1,4 +1,4 @@
-from src.agent.state import Evaluation
+from schemas import Evaluation
 
 
 def test_evaluation_schema():

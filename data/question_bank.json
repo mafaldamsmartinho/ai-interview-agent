@@ -4,6 +4,11 @@
     "What is overfitting and how can it be reduced?",
     "Why do we split data into training and test sets?"
   ],
+  "Deep Learning": [
+    "What is backpropagation and why is it useful?",
+    "Why do neural networks need nonlinear activation functions?",
+    "What is the difference between an epoch and a batch?"
+  ],
   "LLMs": [
     "What is the purpose of tokenization in a language model?",
     "What is the difference between prompting and fine-tuning?",

@@ -26,16 +26,6 @@ TOOL_TIERS = {
         tier=AuthorizationTier.AUTONOMOUS,
         reason="Read-only access to topic reference notes.",
     ),
-    "get_candidate_history": ToolClassification(
-        tool_name="get_candidate_history",
-        tier=AuthorizationTier.AUTONOMOUS,
-        reason="Read-only access to candidate interview history.",
-    ),
-    "save_interview_result": ToolClassification(
-        tool_name="save_interview_result",
-        tier=AuthorizationTier.APPROVE,
-        reason="Writes persistent candidate data and requires approval.",
-    ),
 }
 
 
