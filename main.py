@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -5,6 +7,7 @@ from langfuse import get_client
 from langfuse.langchain import CallbackHandler
 from langgraph.types import Command
 
+from schemas import VERDICT_TO_SCORE
 from src.agent.graph import build_graph
 from src.agent.state import InterviewState
 from src.memory import models  # noqa: F401
@@ -23,11 +26,14 @@ def main():
     langfuse = get_client()
     langfuse_handler = CallbackHandler()
 
-    topic = input(
-        "\nChoose a topic "
-        "(Machine Learning / Deep Learning / LLMs / "
-        "AI Agents / Healthcare AI): "
-    )
+    topics = ["Machine Learning", "Deep Learning", "LLMs", "AI Agents", "Healthcare AI"]
+    topic_names = {topic.casefold(): topic for topic in topics}
+    while True:
+        topic = input(f"\nChoose a topic ({' / '.join(topics)}): ").strip().casefold()
+        if topic in topic_names:
+            topic = topic_names[topic]
+            break
+        print("Please choose one of the listed topics.")
 
     initial_state: InterviewState = {
         "topic": topic,
@@ -39,16 +45,17 @@ def main():
         "continue_interview": True,
     }
 
+    session_id = str(uuid4())
     config = {
         "configurable": {
-            "thread_id": "interview-1",
+            "thread_id": session_id,
         },
         "recursion_limit": 50,
         "callbacks": [langfuse_handler],
         "run_name": "adaptive-interview",
         "metadata": {
-            "langfuse_session_id": "interview-1",
-            "langfuse_tags": ["v8", "interview-agent"],
+            "langfuse_session_id": session_id,
+            "langfuse_tags": ["interview-agent"],
         },
     }
     result = graph.invoke(
@@ -56,17 +63,21 @@ def main():
         config=config,
     )
 
-    print(result)
-
     while "__interrupt__" in result:
         interrupt_data = result["__interrupt__"][0].value
 
         if interrupt_data.get("type") == "evaluation_review":
             print(f"\nAI verdict: {interrupt_data['ai_verdict']}")
 
-            verdict = (
-                input("Human verdict(excellent/good/partial/poor): ").strip().lower()
-            )
+            while True:
+                verdict = (
+                    input("Human verdict (excellent/good/partial/poor): ")
+                    .strip()
+                    .lower()
+                )
+                if verdict in VERDICT_TO_SCORE:
+                    break
+                print("Please enter excellent, good, partial, or poor.")
 
             result = graph.invoke(
                 Command(resume=verdict),
@@ -80,7 +91,6 @@ def main():
                 Command(resume=confirmation == "y"),
                 config=config,
             )
-            print(result)
 
     langfuse.flush()
 

@@ -31,6 +31,9 @@ def update_skill_profile(
     weakness: str,
 ) -> None:
     score = VERDICT_TO_SCORE[verdict] / 10
+    weakness = weakness.strip()
+    if weakness.lower() in no_weakness_values:
+        weakness = ""
 
     with SessionLocal() as session:
         try:
@@ -60,10 +63,7 @@ def update_skill_profile(
 
                 weaknesses = json.loads(profile.weaknesses)
 
-                if (
-                    weakness.strip().lower() not in no_weakness_values
-                    and weakness not in weaknesses
-                ):
+                if weakness and weakness not in weaknesses:
                     weaknesses.append(weakness)
 
                 profile.weaknesses = json.dumps(weaknesses)

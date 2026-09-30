@@ -12,7 +12,6 @@ from src.agent.nodes import (
     route_after_continue,
     route_after_plan,
     route_by_confidence,
-    save_result_node,
     update_memory_node,
 )
 from src.agent.state import InterviewState
@@ -28,7 +27,6 @@ def build_graph():
     builder.add_node("generate_question", generate_question_node(question_llm))
     builder.add_node("collect_answer", collect_answer)
     builder.add_node("evaluate_answer", evaluate_answer_node)
-    builder.add_node("save_result", save_result_node)
     builder.add_node("ask_to_continue", ask_to_continue)
     builder.add_node("human_review", human_review_node)
     builder.add_node("update_memory", update_memory_node)
@@ -60,13 +58,11 @@ def build_graph():
         route_after_plan,
         {
             "coach": "coach",
-            "continue": "save_result",
+            "continue": "ask_to_continue",
         },
     )
 
-    builder.add_edge("coach", "save_result")
-    # Continue after saving
-    builder.add_edge("save_result", "ask_to_continue")
+    builder.add_edge("coach", "ask_to_continue")
 
     # Conditional route:
     # continue → another question

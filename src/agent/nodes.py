@@ -107,7 +107,7 @@ def collect_answer(state: InterviewState):
 
 
 def evaluate_answer_node(state: InterviewState):
-    """Evaluate the candidate's answer and update persistent memory."""
+    """Evaluate the candidate's answer."""
 
     decision = route_model(
         question=state["question"],
@@ -249,12 +249,11 @@ def human_review_node(state: InterviewState):
         }
     )
 
-    if human_verdict in VERDICT_TO_SCORE:
-        evaluation.verdict = human_verdict
+    evaluation = evaluation.model_copy(update={"verdict": human_verdict})
+    print(f"Reviewed score: {VERDICT_TO_SCORE[evaluation.verdict]}/10")
 
     return {
         "evaluation": evaluation,
-        "evaluation_reviewed": True,
     }
 
 
@@ -273,23 +272,6 @@ def update_memory_node(state: InterviewState):
     return {}
 
 
-def save_result_node(state: InterviewState):
-    evaluation = state["evaluation"]
-    request = ToolRequest(
-        tool_name="save_interview_result",
-        arguments={
-            "topic": state["topic"],
-            "question": state["question"],
-            "answer": state["answer"],
-            "score": VERDICT_TO_SCORE[evaluation.verdict],
-        },
-    )
-
-    result = execute_tool_request(request)
-
-    return {"tool_result": result}
-
-
 # --------------------------------------------------
 # ROUTING
 # --------------------------------------------------
@@ -302,18 +284,6 @@ def route_after_continue(state: InterviewState):
         return "continue"
 
     return "end"
-
-
-def route_by_score(state: InterviewState):
-    score = VERDICT_TO_SCORE[state["evaluation"].verdict]
-
-    if score >= 8:
-        return "harder"
-
-    if score >= 7:
-        return "same"
-
-    return "easier"
 
 
 def route_by_confidence(state: InterviewState):

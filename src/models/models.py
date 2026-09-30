@@ -31,7 +31,3 @@ def get_model(provider: ModelProvider) -> BaseChatModel:
 
 def get_router_model() -> BaseChatModel:
     return _create_model("qwen2.5:1.5b")
-
-
-def get_tool_guard_model() -> BaseChatModel:
-    return _create_model("gemma3:1b")

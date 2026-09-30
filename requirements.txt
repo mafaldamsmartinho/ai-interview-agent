@@ -4,7 +4,6 @@ langgraph
 pydantic
 pytest
 ruff
-langchain-openai
 python-dotenv
 mcp[cli]
 sqlalchemy

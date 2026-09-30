@@ -31,11 +31,6 @@ class ToolRequest(BaseModel):
     arguments: dict[str, Any] = Field(default_factory=dict)
 
 
-class ToolGuardDecision(BaseModel):
-    decision: Literal["allow", "confirm", "deny"]
-    reason: str
-
-
 class InterviewQuestion(BaseModel):
     question: str
     skill: str
