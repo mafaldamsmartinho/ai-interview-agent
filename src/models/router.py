@@ -26,7 +26,11 @@ Candidate answer:
 
 
 def route_model(question: str, answer: str) -> RoutingDecision:
-    model = get_router_model().with_structured_output(RoutingDecision)
+    model = (
+        get_router_model()
+        .with_structured_output(RoutingDecision)
+        .with_retry(stop_after_attempt=2)
+    )
 
     chain = router_prompt | model
 

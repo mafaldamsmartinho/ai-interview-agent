@@ -8,6 +8,7 @@ def test_evaluation_schema():
         missing_concepts="None significant",
         improved_answer="Good answer",
         verdict="good",
+        confidence="high",
     )
 
     assert evaluation.verdict == "good"

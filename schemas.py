@@ -18,6 +18,7 @@ class Evaluation(BaseModel):
     missing_concepts: str
     improved_answer: str
     verdict: Literal["excellent", "good", "partial", "poor"]
+    confidence: Literal["high", "medium", "low"]
 
 
 class RoutingDecision(BaseModel):
@@ -38,3 +39,19 @@ class ToolGuardDecision(BaseModel):
 class InterviewQuestion(BaseModel):
     question: str
     skill: str
+
+
+class InterviewPlan(BaseModel):
+    action: Literal[
+        "probe",
+        "harder",
+        "easier",
+        "new_skill",
+        "coach",
+    ]
+    reason: str
+
+
+class CoachOutput(BaseModel):
+    explanation: str
+    study_recommendation: str
