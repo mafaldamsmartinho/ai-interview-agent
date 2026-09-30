@@ -56,8 +56,7 @@ def update_skill_profile(
                 total_score = profile.average_score * profile.attempts
 
                 profile.attempts += 1
-                profile.average_score = (
-                    total_score + score) / profile.attempts
+                profile.average_score = (total_score + score) / profile.attempts
 
                 weaknesses = json.loads(profile.weaknesses)
 

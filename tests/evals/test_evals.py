@@ -1,8 +1,12 @@
+import pytest
+
 from schemas import Evaluation, InterviewPlan
 from src.models.models import ModelProvider, get_model
 from src.prompts.prompts import evaluation_prompt, planner_prompt
 from tests.evals.evaluator_cases import EVALUATOR_CASES
 from tests.evals.planner_cases import PLANNER_CASES
+
+pytestmark = pytest.mark.skip(reason="LLM evals are non-deterministic and run manually")
 
 
 def run_evaluator_evals():

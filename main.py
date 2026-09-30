@@ -65,9 +65,7 @@ def main():
             print(f"\nAI verdict: {interrupt_data['ai_verdict']}")
 
             verdict = (
-                input(
-                    "Human verdict"
-                    "(excellent/good/partial/poor): ").strip().lower()
+                input("Human verdict(excellent/good/partial/poor): ").strip().lower()
             )
 
             result = graph.invoke(
@@ -76,8 +74,7 @@ def main():
             )
 
         else:
-            confirmation = input(
-                "\nApprove tool execution? (y/n): ").strip().lower()
+            confirmation = input("\nApprove tool execution? (y/n): ").strip().lower()
 
             result = graph.invoke(
                 Command(resume=confirmation == "y"),

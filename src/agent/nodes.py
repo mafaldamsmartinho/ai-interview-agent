@@ -66,8 +66,7 @@ def generate_question_node(llm: BaseChatModel):
             question_bank = []
 
         # Generate adaptive question
-        structured_llm = llm.with_structured_output(
-            InterviewQuestion).with_retry(
+        structured_llm = llm.with_structured_output(InterviewQuestion).with_retry(
             stop_after_attempt=2
         )
         question_chain = question_prompt | structured_llm

@@ -18,6 +18,4 @@ class SkillProfile(Base):
     # Stored as JSON text for now, e.g. ["attention", "Q/K/V"]
     weaknesses: Mapped[str] = mapped_column(Text, default="[]")
 
-    __table_args__ = (
-        UniqueConstraint("topic", "skill", name="uq_topic_skill"),
-        )
+    __table_args__ = (UniqueConstraint("topic", "skill", name="uq_topic_skill"),)
