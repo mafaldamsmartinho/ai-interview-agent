@@ -74,7 +74,9 @@ def benchmark_router():
 def benchmark_model(provider: ModelProvider):
     llm = get_model(provider)
 
-    structured_llm = llm.with_structured_output(Evaluation)
+    structured_llm = llm.with_structured_output(Evaluation).with_retry(
+        stop_after_attempt=2
+    )
     evaluation_chain = evaluation_prompt | structured_llm
 
     print(f"\n--- {provider.value.upper()} ---")
