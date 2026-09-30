@@ -4,3 +4,4 @@ __pycache__/
 check.ps1
 data/*.db
 data/interview_history.json
+.env
